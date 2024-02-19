@@ -1,17 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { v1 as uuidv1 } from 'uuid';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
   private users = [
     {
-      id: '1',
+      id: 'db2f8780-cee2-11ee-ab85-456328b4c9eb',
       name: 'John Doe',
       email: 'john@example.com',
       password: 'password123',
     },
     {
-      id: '2',
+      id: 'f3931ee0-cee2-11ee-8f17-599eb0aa5890',
       name: 'Jane Smith',
       email: 'jane@example.com',
       password: 'password456',
@@ -19,7 +20,7 @@ export class UserService {
   ];
 
   create(createUserDto: CreateUserDto) {
-    const newUser = { id: Date.now().toString(), ...createUserDto };
+    const newUser = { id: uuidv1(), ...createUserDto };
     this.users.push(newUser);
     return newUser;
   }
