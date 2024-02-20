@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { v1 as uuidv1 } from 'uuid';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
@@ -21,14 +25,20 @@ export class UserService {
   ];
 
   async create(createUserDto: CreateUserDto) {
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const newUser = {
-      id: uuidv1(),
-      ...createUserDto,
-      password: hashedPassword,
-    };
-    this.users.push(newUser);
-    return newUser;
+    try {
+      const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+      const newUser = {
+        id: uuidv1(),
+        ...createUserDto,
+        password: hashedPassword,
+      };
+      this.users.push(newUser);
+      return newUser;
+    } catch (error) {
+      throw new BadRequestException(
+        'Error creating user. Check the data provided.',
+      );
+    }
   }
 
   findAll() {
@@ -37,20 +47,32 @@ export class UserService {
 
   findOne(id: string) {
     const user = this.users.find((u) => u.id === id);
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     return user;
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto) {
     const userIndex = this.users.findIndex((u) => u.id === id);
-    if (userIndex === -1) throw new NotFoundException('User not found');
-    this.users[userIndex] = { ...this.users[userIndex], ...updateUserDto };
-    return this.users[userIndex];
+    if (userIndex === -1) {
+      throw new NotFoundException('User not found');
+    }
+    try {
+      this.users[userIndex] = { ...this.users[userIndex], ...updateUserDto };
+      return this.users[userIndex];
+    } catch (error) {
+      throw new BadRequestException(
+        'Error updating user. Check the data provided.',
+      );
+    }
   }
 
   remove(id: string) {
     const userIndex = this.users.findIndex((u) => u.id === id);
-    if (userIndex === -1) throw new NotFoundException('User not found');
+    if (userIndex === -1) {
+      throw new NotFoundException('User not found.');
+    }
     const removedUser = this.users[userIndex];
     this.users.splice(userIndex, 1);
     return removedUser;
