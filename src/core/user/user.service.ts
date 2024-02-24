@@ -7,6 +7,8 @@ import { v1 as uuidv1 } from 'uuid';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 
+export type User = any;
+
 @Injectable()
 export class UserService {
   private users = [
@@ -14,7 +16,7 @@ export class UserService {
       id: 'db2f8780-cee2-11ee-ab85-456328b4c9eb',
       name: 'Mathew',
       email: 'matthew@gmail.com',
-      password: '$2b$10$Q.Z37/8VMCI9OfQZ9PdyMuMPp7lWnNli4yZ09M5cvbiAr0F8EkiXm',
+      password: 'toor',
     },
     {
       id: 'f3931ee0-cee2-11ee-8f17-599eb0aa5890',
@@ -45,11 +47,8 @@ export class UserService {
     return this.users;
   }
 
-  findOne(id: string) {
-    const user = this.users.find((u) => u.id === id);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+  async findOne(email: string): Promise<User | undefined> {
+    const user = this.users.find((user) => user.email === email);
     return user;
   }
 
