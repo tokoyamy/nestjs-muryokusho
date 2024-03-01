@@ -4,7 +4,6 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { v1 as uuidv1 } from 'uuid';
-import * as bcrypt from 'bcrypt';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 
 export type User = any;
@@ -18,21 +17,14 @@ export class UserService {
       email: 'matthew@gmail.com',
       password: 'toor',
     },
-    {
-      id: 'f3931ee0-cee2-11ee-8f17-599eb0aa5890',
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      password: '$2b$10$L9Lz/f9C7ug0FJJls8kP5Oeq4kZSf.SjVbcZvcvVDYg0vzL1DJMSi',
-    },
   ];
 
   async create(createUserDto: CreateUserDto) {
     try {
-      const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
       const newUser = {
         id: uuidv1(),
         ...createUserDto,
-        password: hashedPassword,
+        password: createUserDto.password,
       };
       this.users.push(newUser);
       return newUser;

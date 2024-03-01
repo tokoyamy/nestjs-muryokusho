@@ -12,7 +12,8 @@ import { UserService } from './user.service';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { AuthGuard } from '../auth/auth.guard';
 
-@Controller('users')
+@UseGuards(AuthGuard)
+@Controller('api/v1/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -21,7 +22,6 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  @UseGuards(AuthGuard)
   @Get()
   async findAll() {
     return this.userService.findAll();
