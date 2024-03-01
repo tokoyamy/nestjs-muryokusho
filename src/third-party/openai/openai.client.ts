@@ -1,11 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { GentPlatAssistantePayload } from './dto/gentplat-assistante.dto';
 import { ThirdPartyUtils } from '../utils/third-party-utils';
 
 @Injectable()
-export class GenplatClient {
+export class OpenaiClient {
   private logger: Logger;
   private baseUrl: string;
   private token: string;
@@ -22,12 +21,12 @@ export class GenplatClient {
   private buildHeader() {
     return {
       'Content-Type': 'application/json',
-      'x-requester-token': `${this.token}`,
+      Authorization: `Bearer ${this.token}`,
       'OpenAI-Beta': 'assistants=v1',
     };
   }
 
-  async chat(contentUser: string, modelGpt: string): Promise<any> {
+  async legacyCompletions(contentUser: string, modelGpt: string): Promise<any> {
     this.logger.log(`user question to gpt`);
     try {
       const payload = JSON.stringify({
@@ -74,7 +73,7 @@ export class GenplatClient {
         model: modelGpt,
       };
       const result = await this.httpService
-        .post(`${this.baseUrl}/api/v1/proxy/openai/v1/assistants`, payload, {
+        .post(`${this.baseUrl}/v1/assistants`, payload, {
           headers: this.buildHeader(),
         })
         .toPromise();
@@ -87,5 +86,4 @@ export class GenplatClient {
       );
     }
   }
-
 }

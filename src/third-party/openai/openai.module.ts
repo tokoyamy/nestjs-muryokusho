@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
-import { GenplatClient } from './genplat.client';
+import { OpenaiClient } from './openai.client';
 
 @Module({
   imports: [HttpModule, ConfigModule],
-  providers: [GenplatClient],
-  exports: [GenplatClient],
+  providers: [OpenaiClient],
+  exports: [OpenaiClient],
 })
 export class GenplatModule {}
