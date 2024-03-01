@@ -6,9 +6,12 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { AiService } from './ai.service';
+import { AuthGuard } from '../auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('/api/v1/ai')
 export class AiController {
   constructor(private readonly aiService: AiService) {}
