@@ -8,4 +8,4 @@ import { OpenaiClient } from './openai.client';
   providers: [OpenaiClient],
   exports: [OpenaiClient],
 })
-export class GenplatModule {}
+export class OpenaiModule {}
