@@ -4,6 +4,7 @@ import { v1 as uuidv1 } from 'uuid';
 import { UserEntity } from './entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CreateUserDto } from './dto/createUser.dto';
 
 export type User = any;
 
@@ -14,12 +15,15 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async createUser(createUserDto): Promise<UserEntity> {
+  async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
     const saltOrRound = 10;
 
     const passwordHashed = await hash(createUserDto.password, saltOrRound);
 
-    return this.userRepository.save({ ...createUserDto, passwordHashed });
+    return this.userRepository.save({
+      ...createUserDto,
+      password: passwordHashed,
+    });
   }
 
   async getAllUser(): Promise<UserEntity[]> {
