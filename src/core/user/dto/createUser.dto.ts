@@ -11,18 +11,6 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsString()
-  @MinLength(6)
+  @MinLength(8)
   readonly password: string;
-}
-
-export class UpdateUserDto {
-  @IsString()
-  readonly name?: string;
-
-  @IsEmail()
-  readonly email?: string;
-
-  @IsString()
-  @MinLength(6)
-  readonly password?: string;
 }
