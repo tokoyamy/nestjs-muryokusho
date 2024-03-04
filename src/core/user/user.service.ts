@@ -1,71 +1,42 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { hash } from 'bcrypt';
 import { v1 as uuidv1 } from 'uuid';
-import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { UserEntity } from './entity/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 export type User = any;
 
 @Injectable()
 export class UserService {
-  private users = [
-    {
-      id: 'db2f8780-cee2-11ee-ab85-456328b4c9eb',
-      name: 'Mathew',
-      email: 'matthew@gmail.com',
-      password: 'toor',
-    },
-  ];
+  constructor(
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+  ) {}
 
-  async create(createUserDto: CreateUserDto) {
-    try {
-      const newUser = {
-        id: uuidv1(),
-        ...createUserDto,
-        password: createUserDto.password,
-      };
-      this.users.push(newUser);
-      return newUser;
-    } catch (error) {
-      throw new BadRequestException(
-        'Error creating user. Check the data provided.',
-      );
+  async createUser(createUserDto): Promise<UserEntity> {
+    const saltOrRound = 10;
+
+    const passwordHashed = await hash(createUserDto.password, saltOrRound);
+
+    return this.userRepository.save({ ...createUserDto, passwordHashed });
+  }
+
+  async getAllUser(): Promise<UserEntity[]> {
+    return this.userRepository.find();
+  }
+
+  async findUserByEmail(email: string): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`Email: ${email} Not Found`);
     }
-  }
 
-  findAll() {
-    return this.users;
-  }
-
-  async findOne(email: string): Promise<User | undefined> {
-    const user = this.users.find((user) => user.email === email);
     return user;
-  }
-
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    const userIndex = this.users.findIndex((u) => u.id === id);
-    if (userIndex === -1) {
-      throw new NotFoundException('User not found');
-    }
-    try {
-      this.users[userIndex] = { ...this.users[userIndex], ...updateUserDto };
-      return this.users[userIndex];
-    } catch (error) {
-      throw new BadRequestException(
-        'Error updating user. Check the data provided.',
-      );
-    }
-  }
-
-  remove(id: string) {
-    const userIndex = this.users.findIndex((u) => u.id === id);
-    if (userIndex === -1) {
-      throw new NotFoundException('User not found.');
-    }
-    const removedUser = this.users[userIndex];
-    this.users.splice(userIndex, 1);
-    return removedUser;
   }
 }
